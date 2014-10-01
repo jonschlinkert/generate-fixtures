@@ -1,0 +1,56 @@
+{
+  "name": "generate-fixtures",
+  "description": "Command line tool for easily generating test fixtures. Specify the number of files to create and the destination directory to write them to, and files and directories will be randomly generated in the specified destination.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/generate-fixtures",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonschlinkert/generate-fixtures.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/generate-fixtures/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jonschlinkert/generate-fixtures/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "preferGlobal": true,
+  "bin": {
+    "fixtures": "./cli.js"
+  },
+  "devDependencies": {
+    "verb-tag-jscomments": ">= 0.2.0",
+    "verb": ">= 0.2.6",
+    "mocha": "*"
+  },
+  "keywords": [
+    "fixture",
+    "fixtures",
+    "helper",
+    "helpers",
+    "javascript",
+    "node.js",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "arr": "^0.1.0",
+    "delete": "^0.1.5",
+    "minimist": "^1.1.0",
+    "verbalize": "^0.1.2",
+    "write": "^0.1.1"
+  }
+}
