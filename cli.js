@@ -16,6 +16,8 @@ var force = argv.force || argv.f;
 
 var ext = argv.ext || argv.e;
 var num = argv.num || argv.n || utils.firstNumber(argv._) || 50;
+var contents = argv.contents || argv.c;
+var filename = argv.filename || 'abc';
 
 var createDir = argv.d || argv.dest  || utils.firstString(argv._);
 var deleteDir = argv.rm;
@@ -38,9 +40,9 @@ if (createDir) {
     createDir = path.join(process.cwd(), createDir);
     console.log();
     console.log(log.gray(' [fixtures] writing to:'), createDir);
-    var opts = {num: num, dest: createDir};
+    var opts = {num: num, dest: createDir, contents: contents};
     if (ext) opts.ext = ext;
-    fixtures('abc', opts);
+    fixtures(filename, opts);
     log.success(' Done.');
   }
 } else if (deleteDir) {
