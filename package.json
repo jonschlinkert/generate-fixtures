@@ -1,7 +1,7 @@
 {
   "name": "generate-fixtures",
   "description": "Command line tool for easily generating test fixtures. Specify the number of files to create and the destination directory to write them to, and files and directories will be randomly generated in the specified destination.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/jonschlinkert/generate-fixtures",
   "author": {
     "name": "Jon Schlinkert",
@@ -42,12 +42,17 @@
     "helper",
     "helpers",
     "javascript",
-    "node.js",
+    "js",
+    "node",
+    "node-js",
     "test",
-    "tests"
+    "tests",
+    "util",
+    "utility",
+    "utils"
   ],
   "dependencies": {
-    "arr": "^0.1.0",
+    "arr": "^0.1.4",
     "delete": "^0.1.5",
     "minimist": "^1.1.0",
     "mixin-deep": "^0.1.0",

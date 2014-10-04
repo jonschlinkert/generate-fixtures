@@ -16,47 +16,68 @@ var force = argv.force || argv.f;
 
 var ext = argv.ext || argv.e;
 var num = argv.num || argv.n || utils.firstNumber(argv._) || 50;
+var dest = argv.d || argv.dest  || utils.firstString(argv._);
 var contents = argv.contents || argv.c;
-var filename = argv.filename || 'abc';
-
-var createDir = argv.d || argv.dest  || utils.firstString(argv._);
-var deleteDir = argv.rm;
+var remove = argv.rm;
 
 
-if ((argv.num || argv.n) && !createDir) {
+if ((argv.num || argv.n) && !dest) {
   log.inform('please define a destination directory with `-d`');
 }
 
-if (createDir) {
-  if (fs.existsSync(createDir) && !force) {
+
+/**
+ * Set options
+ */
+
+var opts = {num: num, dest: dest};
+if (contents) {
+  opts.contents = contents;
+}
+
+if (ext) {
+  opts.ext = ext;
+}
+
+/**
+ * Create fixtures
+ */
+
+if (dest) {
+  if (fs.existsSync(dest) && force == null) {
     console.log();
     log.error(''
-      + ' [fixtures] WARNING! directory "' + createDir + '"'
+      + ' [fixtures] WARNING! directory "' + dest + '"'
       + ' already exists.\n  Please set `--force` to write'
       + ' to this directory.'
     );
     console.log();
   } else {
-    createDir = path.join(process.cwd(), createDir);
+    dest = path.join(process.cwd(), dest);
     console.log();
-    console.log(log.gray(' [fixtures] writing to:'), createDir);
-    var opts = {num: num, dest: createDir, contents: contents};
-    if (ext) opts.ext = ext;
-    fixtures(filename, opts);
+    console.log(log.gray(' [fixtures] writing to:'), dest);
+    // write fixtures
+    fixtures(dest, opts);
     log.success(' Done.');
   }
-} else if (deleteDir) {
-  if (fs.existsSync(deleteDir) && !force) {
+
+/**
+ * Delete fixtures
+ */
+
+} else if (remove) {
+  if (fs.existsSync(remove) && force == null) {
     console.log();
     log.error(''
       + ' [fixtures] WARNING! Please set `--force` to delete'
       + ' a directory.'
     );
   } else {
-    deleteDir = path.join(process.cwd(), deleteDir);
+    remove = path.join(process.cwd(), remove);
     console.log();
-    console.log(log.gray(' [fixtures] deleting:'), deleteDir);
-    del.sync(deleteDir);
+    console.log(log.gray(' [fixtures] deleting:'), remove);
+    // remove fixtures
+    del.sync(remove);
     log.success(' Done.');
   }
 }

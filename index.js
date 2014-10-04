@@ -1,14 +1,18 @@
 'use strict';
 
+var fs = require('fs');
 var path = require('path');
 var write = require('write');
-var fs = require('fs');
-
-// Shuffle the words in the fixtures
 var shuffle = require('shuffle-words');
 var range = require('random-range');
 var mixin = require('mixin-deep');
-var str = fs.readFileSync('content/short.txt', 'utf8');
+var str = fs.readFileSync(__dirname + '/content/short.txt', 'utf8');
+var exts = ['.txt', '.js', '.json', '.hbs', '.md'];
+
+
+function arrayify(val) {
+  return Array.isArray(val) ? val : [val];
+}
 
 var words = str.split(' ')
   .map(function (word) {
@@ -17,14 +21,15 @@ var words = str.split(' ')
       .toLowerCase();
   }).filter(Boolean);
 
+
 function random(min, max) {
   return Math.floor(Math.random() * (max - min)) + (min + 1);
 }
 
 function pick(words) {
   var len = words.length;
-  var num = random(0, len);
-  return words[num || 1];
+  var num = random(0, len - 1);
+  return words[num];
 }
 
 /**
@@ -34,13 +39,59 @@ function pick(words) {
  * @return {[type]}
  */
 
-function dirname(depth) {
+function base(depth, sep) {
   var arr = [];
   while (depth--) {
     var dir = pick(words);
     arr.push(dir);
   }
-  return arr.join('/');
+  return arr.join(sep);
+}
+
+/**
+ * Fix slashes on file paths. Pass one or a list
+ * of file paths.
+ *
+ * @param  {String} `paths`
+ * @return {String}
+ */
+
+function slashify(paths) {
+  return path.join.apply(path, arguments)
+    .replace(/\\/g, '/');
+}
+
+/**
+ * Randomly pick an extension for a fixture.
+ *
+ * @param  {String} `ext`
+ * @return {String}
+ */
+
+function pickExt(ext) {
+  if (ext == null) {
+    ext = exts;
+  }
+  var len = ext.length;
+  var i = random(0, len - 1);
+  return arrayify(ext)[i];
+}
+
+/**
+ * Generate the directory for each fixture.
+ *
+ * @param  {[type]} depth
+ * @return {[type]}
+ */
+
+function normalize(sep) {
+  var args = [].slice.call(arguments, 1);
+
+  if (sep === '/') {
+    return slashify.apply(slashify, args);
+  }
+
+  return args.join(sep);
 }
 
 /**
@@ -51,17 +102,15 @@ function dirname(depth) {
  */
 
 function filepath(options) {
-  var defaults = {maxDepth: 5, root: 'temp'};
-  var opts = mixin(defaults, options);
+  var defaults = {maxDepth: 5, root: 'temp', sep: '/'};
+  var opts = mixin({}, defaults, options);
   var max = opts.maxDepth;
 
   var depth = opts.depth || random(1, max);
   var root = opts.root || 'temp';
-  var ext = opts.ext || '.txt';
+  var dir = base(depth, opts.sep);
 
-  var dir = dirname(depth);
-
-  return path.join(root, dir) + ext;
+  return normalize(opts.sep, root, dir);
 }
 
 /**
@@ -77,10 +126,18 @@ function tree(num, options) {
   var arr = [];
 
   while (num--) {
-    arr.push(filepath(opts));
+    arr.push(filepath(opts, {sep: '/'}));
+    // arr.push(filepath(opts, {sep: opts.sep}));
   }
   return arr;
 }
+
+/**
+ * Make content appear a little less contrived.
+ *
+ * @param  {Array} arr
+ * @return {Array}
+ */
 
 function adjust(arr) {
   var len = words.length;
@@ -90,14 +147,23 @@ function adjust(arr) {
   return [a, b];
 }
 
-module.exports = function fixtures(files, options) {
-  var opts = mixin({}, options);
+/**
+ * Generate fixtures
+ *
+ * @param  {Array} `files`
+ * @param  {Array} `options`
+ * @return {Array}
+ */
+
+module.exports = function fixtures(dir, options) {
+  var opts = mixin({depth: 5}, options);
   var num = opts.num || 25;
 
   var files = tree(num, opts);
-  var contents;
 
-  files.forEach(function (filepath, i) {
+  files.forEach(function (filepath) {
+    var dest = path.join(dir, filepath);
+    var ext = pickExt(opts.ext);
     var len = words.length;
     var arr = adjust(range(len));
 
@@ -105,8 +171,8 @@ module.exports = function fixtures(files, options) {
     var b = arr[1];
 
     var text = words.slice(a, b);
-    contents = shuffle(text);
+    var contents = shuffle(text);
 
-    write.sync(filepath, contents);
+    write.sync(dest + ext, contents);
   });
-}
+};
